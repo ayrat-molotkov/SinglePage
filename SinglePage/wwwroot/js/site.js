@@ -6,7 +6,14 @@
             type: "POST",
             contentType: 'application/json; charset=utf-8'
         });
-    };    
+    };
+
+    function calculationWorkServers() {
+        return $.ajax('/Home/CalculationWorkServers', {
+            type: "POST",
+            contentType: 'application/json; charset=utf-8'
+        });
+    };
 
     $('#add-button').on("click", function () {
         addNewVirtualServer()
@@ -24,11 +31,20 @@
                     serverTr.appendChild(createTh(removeCheckbox));
 
                     table[0].getElementsByTagName('tbody')[0].appendChild(serverTr);
+
+                    $('#current-date')[0].innerHTML = getDateTimeFormat(data.nowTime)
+                    $('#total-usage-time')[0].innerHTML = data.calculationTime
                 } else {
                     alert('Server error')
                 }
                 
             })
+
+        //calculationWorkServers()
+        //    .done(function (data) {
+        //        $('#current-date')[0].innerHTML = getDateTimeFormat(data.nowTime)
+        //        $('#total-usage-time')[0].innerHTML = data.calculationTime
+        //    })
     });
 
     function getDateTimeFormat(dateStr) {
