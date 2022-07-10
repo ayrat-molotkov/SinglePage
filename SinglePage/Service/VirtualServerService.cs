@@ -34,20 +34,22 @@ public class VirtualServerService
         return newVirtualServer;
     }
 
-    public async Task<bool> DeleteServers(List<int> ids)
+    public async Task<List<VirtualServer>> DeleteServers(List<int> ids)
     {
         foreach (int id in ids)
         {
             var existServer = await _context.VirtualServers.FindAsync(id);
 
-            if (existServer != null)
-                _context.Remove(existServer);
+            existServer.RemoveDateTime = DateTime.Now;
+
+            _context.VirtualServers.Update(existServer);
         }
 
         await _context.SaveChangesAsync();
-        _context.ChangeTracker.Clear();
 
-        return true;
+        var allServers = await _context.VirtualServers.ToListAsync();
+
+        return allServers;
     }
 
 

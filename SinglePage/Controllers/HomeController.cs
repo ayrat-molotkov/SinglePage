@@ -5,11 +5,11 @@ using System.Diagnostics;
 
 namespace SinglePage.Controllers;
 public class HomeController : Controller
-{    
+{
     private readonly VirtualServerService _virtualServerService;
 
     public HomeController(VirtualServerService virtualServerService)
-    {        
+    {
         _virtualServerService = virtualServerService;
     }
 
@@ -21,19 +21,18 @@ public class HomeController : Controller
 
         var calculationTime = await _virtualServerService.CalculationWorkServers();
 
-        return Json(new {newServer = newServer, calculationTime = calculationTime, nowTime = DateTime.Now, status = "success" });
+        return Json(new { newServer = newServer, calculationTime = calculationTime, nowTime = DateTime.Now, status = "success" });
     }
 
 
     [HttpPost]
-    public async Task<JsonResult> DeleteServers(List<int> ids)
+    public async Task<JsonResult> DeleteServers([FromBody] IEnumerable<int> ids)
     {
-        var deleteResult = await _virtualServerService.DeleteServers(ids);
+        var allServers = await _virtualServerService.DeleteServers(ids.ToList());
 
-        if(deleteResult)
-            return Json(new { status = "success" });
+        var calculationTime = await _virtualServerService.CalculationWorkServers();
 
-        return Json(new { status = "failed" });
+        return Json(new { calculationTime = calculationTime, nowTime = DateTime.Now, allServers = allServers, status = "success" });
     }
 
 
@@ -51,5 +50,5 @@ public class HomeController : Controller
         var servers = await _virtualServerService.GetAllServers();
 
         return View(new VirtualServerViewModel(servers));
-    }    
+    }
 }

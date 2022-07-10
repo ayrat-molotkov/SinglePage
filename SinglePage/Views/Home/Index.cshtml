@@ -40,18 +40,18 @@
         </tr>
         @foreach (var item in Model.VirtualServers)
         {
-            <tr>
+            <tr class ="virtual-server-item" data-id="@item.VirtualServerId">
                 <td>
                     @item.VirtualServerId
                 </td>
                 <td>
                     @item.CreateDateTime.ToString("yyyy.MM.dd HH:mm:ss")
                 </td>
-                <td>
+                <td class="remove-date">
                     @(item.RemoveDateTime != null ? item.RemoveDateTime.Value.ToString("yyyy.MM.dd HH:mm:ss") : string.Empty)
                 </td>
                 <td>
-                    <input type="checkbox" />
+                    <input type="checkbox" class="deleted-checkbox" />
                 </td>
             </tr>
         }
