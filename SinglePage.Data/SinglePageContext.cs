@@ -17,4 +17,14 @@ public class SinglePageContext : DbContext
     }
 
     public DbSet<VirtualServer> VirtualServers { get; set; }
+
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.Entity<VirtualServer>(c =>
+        {
+            c.HasKey(c => c.VirtualServerId);
+            c.Property(p => p.RemoveDateTime).HasDefaultValue(null);
+        });        
+    }
 }
