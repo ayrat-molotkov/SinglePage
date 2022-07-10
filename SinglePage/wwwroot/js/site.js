@@ -6,14 +6,7 @@
             type: "POST",
             contentType: 'application/json; charset=utf-8'
         });
-    };
-
-    function calculationWorkServers() {
-        return $.ajax('/Home/CalculationWorkServers', {
-            type: "POST",
-            contentType: 'application/json; charset=utf-8'
-        });
-    };
+    };    
 
     $('#add-button').on("click", function () {
         addNewVirtualServer()
@@ -33,27 +26,28 @@
                     table[0].getElementsByTagName('tbody')[0].appendChild(serverTr);
 
                     $('#current-date')[0].innerHTML = getDateTimeFormat(data.nowTime)
-                    $('#total-usage-time')[0].innerHTML = data.calculationTime
+                    $('#total-usage-time')[0].innerHTML = data.calculationTime.substring(0, data.calculationTime.indexOf('.'))                    
                 } else {
                     alert('Server error')
                 }
                 
-            })
-
-        //calculationWorkServers()
-        //    .done(function (data) {
-        //        $('#current-date')[0].innerHTML = getDateTimeFormat(data.nowTime)
-        //        $('#total-usage-time')[0].innerHTML = data.calculationTime
-        //    })
+            })        
     });
 
     function getDateTimeFormat(dateStr) {
         var date = new Date(dateStr);
-        var M = date.getMonth()+1,
-            d = date.getDate(),
+        var M = (date.getMonth() + 1).toString(),
+            d = (date.getDate()).toString(),
             h = date.getHours(),
             m = date.getMinutes(),
             s = date.getSeconds()
+
+        if (M.length < 2) {
+            M = '0' + M;
+        }
+        if (d.length < 2) {
+            d = '0' + d;
+        }
 
         return [date.getFullYear().toString(), M, d].join('.') + ' ' + [h, m, s].join(':')
     }
