@@ -42,7 +42,7 @@ public class HomeController : Controller
     {
         var calculationTime = await _virtualServerService.CalculationWorkServers();
 
-        return Json(new { calculationTime = calculationTime, nowTime = DateTime.Now });
+        return Json(new { calculationTime = calculationTime, nowTime = DateTime.Now, status = "success" });
     }
 
 
