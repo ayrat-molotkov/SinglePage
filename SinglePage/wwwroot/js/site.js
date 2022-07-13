@@ -113,7 +113,7 @@
 
     function updateCurrentDateAndTotalUsageTime(currentDate, totalUsageTime) {
         $('#current-date')[0].innerHTML = getDateTimeFormat(currentDate)
-        $('#total-usage-time')[0].innerHTML = totalUsageTime.substring(0, totalUsageTime.indexOf('.'))
+        $('#total-usage-time')[0].innerHTML = totalUsageTime.substring(0, totalUsageTime.lastIndexOf('.'))
     }
 
     function calculationWorkServers() {
@@ -138,4 +138,5 @@
     }
 
     listenCheckboxChange();
+    calculationWorkServers();
 });

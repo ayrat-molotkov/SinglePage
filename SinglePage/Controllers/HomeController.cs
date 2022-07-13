@@ -26,14 +26,13 @@ public class HomeController : Controller
 
 
     [HttpPost]
-    public async Task<JsonResult> DeleteServers(List<int> ids)
+    public async Task<JsonResult> DeleteServers([FromBody] IEnumerable<int> ids)
     {
-        var deleteResult = await _virtualServerService.DeleteServers(ids);
+        var allServers = await _virtualServerService.DeleteServers(ids.ToList());
 
-        if(deleteResult)
-            return Json(new { status = "success" });
+        var calculationTime = await _virtualServerService.CalculationWorkServers();
 
-        return Json(new { status = "failed" });
+        return Json(new { calculationTime = calculationTime, nowTime = DateTime.Now, allServers = allServers, status = "success" });
     }
 
 

@@ -29,40 +29,66 @@ public class VirtualServerService
 
         await _context.VirtualServers.AddAsync(newVirtualServer);
 
-        await _context.SaveChangesAsync();        
+        await _context.SaveChangesAsync();
 
         return newVirtualServer;
     }
 
-    public async Task<bool> DeleteServers(List<int> ids)
+    public async Task<List<VirtualServer>> DeleteServers(List<int> ids)
     {
         foreach (int id in ids)
         {
             var existServer = await _context.VirtualServers.FindAsync(id);
 
-            if (existServer != null)
-                _context.Remove(existServer);
+            existServer.RemoveDateTime = DateTime.Now;
+
+            _context.VirtualServers.Update(existServer);
         }
 
         await _context.SaveChangesAsync();
-        _context.ChangeTracker.Clear();
 
-        return true;
+        var allServers = await _context.VirtualServers.ToListAsync();
+
+        return allServers;
     }
 
 
     public async Task<TimeSpan?> CalculationWorkServers()
     {
-        var allServers = await _context.VirtualServers.ToListAsync();
+        var allServers = await _context.VirtualServers.ToListAsync();        
 
-        if (allServers.Any(x => x.RemoveDateTime == null))
+        TimeSpan result = new TimeSpan();
+
+        List<int> calculatedServerIds = new List<int>();
+
+        foreach (var item in allServers.GroupBy(x => x.RemoveDateTime))
         {
-            var longerWorkedServer = allServers.Where(x => x.RemoveDateTime == null).OrderBy(x => x.CreateDateTime).First();
+            if (item.Select(x => x.VirtualServerId).Intersect(calculatedServerIds).Any())
+            {
+                continue;
+            }
 
-            return (DateTime.Now - longerWorkedServer.CreateDateTime).Duration();
+            if (item.Key != null)
+            {
+                var serverEndInKeyTime = allServers.Where(x => x.RemoveDateTime == item.Key).OrderBy(x => x.CreateDateTime).First();
+                var otherWorkedServers = allServers.Where(x => x.CreateDateTime > serverEndInKeyTime.CreateDateTime && x.CreateDateTime < serverEndInKeyTime.RemoveDateTime.Value && !calculatedServerIds.Contains(x.VirtualServerId));
+                if (otherWorkedServers.Any())
+                {
+                    result += otherWorkedServers.OrderByDescending(x => x.RemoveDateTime).First().RemoveDateTime.Value - item.OrderBy(x => x.CreateDateTime).First().CreateDateTime;
+                    calculatedServerIds.AddRange(otherWorkedServers.Select(x => x.VirtualServerId));
+                }                    
+                else
+                {
+                    result += item.Key.Value - item.OrderBy(x => x.CreateDateTime).First().CreateDateTime;
+                }                    
+            }                
+            else
+                result += DateTime.Now - item.OrderBy(x => x.CreateDateTime).First().CreateDateTime;
+
+            calculatedServerIds.AddRange(item.Select(x => x.VirtualServerId));
         }
 
-        return null;
+        return result;
     }
 
 
